@@ -42,6 +42,7 @@ export default function StudentRegistration() {
     gender: "",
     feeLevel: "village",
     transactionId: "",
+    photoFile: null as File | null,
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
