@@ -1034,4 +1034,73 @@ export async function registerRoutes(app: Express): Promise<void> {
       res.status(500).json({ error: "Failed to fetch fee records" });
     }
   });
+
+  // Volunteer Profile Routes
+  app.get("/api/volunteer/profile", authMiddleware, async (req: AuthRequest, res) => {
+    try {
+      if (req.user?.role !== "volunteer") {
+        return res.status(403).json({ error: "Volunteers only" });
+      }
+      const volunteer = await Volunteer.findById(req.user.id).select("-password");
+      if (!volunteer) return res.status(404).json({ error: "Volunteer not found" });
+      res.json(volunteer);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch profile" });
+    }
+  });
+
+  app.patch("/api/volunteer/profile", authMiddleware, async (req: AuthRequest, res) => {
+    try {
+      if (req.user?.role !== "volunteer") {
+        return res.status(403).json({ error: "Volunteers only" });
+      }
+      const { fullName, phone, address, city, occupation, skills, availability, qrCodeUrl, upiId } = req.body;
+      const volunteer = await Volunteer.findByIdAndUpdate(
+        req.user.id,
+        {
+          fullName,
+          phone,
+          address,
+          city,
+          occupation,
+          skills,
+          availability,
+          qrCodeUrl,
+          upiId,
+          updatedAt: new Date()
+        },
+        { new: true }
+      ).select("-password");
+      res.json(volunteer);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update profile" });
+    }
+  });
+
+  app.patch("/api/volunteer/payment-details", authMiddleware, async (req: AuthRequest, res) => {
+    try {
+      if (req.user?.role !== "volunteer") {
+        return res.status(403).json({ error: "Volunteers only" });
+      }
+      const { qrCodeUrl, upiId } = req.body;
+      const volunteer = await Volunteer.findByIdAndUpdate(
+        req.user.id,
+        { qrCodeUrl, upiId, updatedAt: new Date() },
+        { new: true }
+      ).select("-password");
+      res.json(volunteer);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update payment details" });
+    }
+  });
+
+  app.get("/api/public/volunteer/:id/payment-details", async (req, res) => {
+    try {
+      const volunteer = await Volunteer.findById(req.params.id).select("qrCodeUrl upiId fullName");
+      if (!volunteer) return res.status(404).json({ error: "Volunteer not found" });
+      res.json(volunteer);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch volunteer details" });
+    }
+  });
 }
