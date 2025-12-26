@@ -266,6 +266,8 @@ const AdmitCardSchema = new Schema<IAdmitCard>({
   examName: { type: String, required: true },
   fileUrl: { type: String, required: true },
   fileName: { type: String, required: true },
+  session: String,
+  classSequence: { type: String, enum: ["1-3", "4-6", "7-8", "9-10", "11-12", "all"], default: "all" },
   uploadedAt: { type: Date, default: Date.now },
 });
 
