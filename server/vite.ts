@@ -29,12 +29,16 @@ export async function setupVite(app: Express) {
     appType: "spa",
   });
 
-  // Skip API routes from Vite middleware
+  // Create a middleware that skips API routes
+  const viteMiddleware = vite.middlewares;
+
   app.use((req, res, next) => {
+    // Skip Vite middleware for API routes - let them be handled by registered routes
     if (req.path.startsWith("/api/")) {
       return next();
     }
-    vite.middlewares(req, res, next);
+    // For all other routes, use Vite's middleware
+    viteMiddleware(req, res, next);
   });
 }
 
