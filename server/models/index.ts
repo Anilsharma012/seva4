@@ -136,6 +136,25 @@ export interface IVolunteerApplication extends Document {
   message?: string;
   status: "pending" | "approved" | "rejected";
   adminNotes?: string;
+  loginCreated: boolean;
+  volunteerId?: mongoose.Types.ObjectId;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface IVolunteer extends Document {
+  email: string;
+  password: string;
+  fullName: string;
+  phone: string;
+  address?: string;
+  city?: string;
+  occupation?: string;
+  skills?: string;
+  availability?: string;
+  qrCodeUrl?: string;
+  upiId?: string;
+  isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
