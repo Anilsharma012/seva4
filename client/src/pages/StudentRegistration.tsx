@@ -251,6 +251,41 @@ export default function StudentRegistration() {
                   <Textarea id="address" name="address" value={formData.address} onChange={handleChange} placeholder="पूरा पता लिखें" rows={3} data-testid="input-address" />
                 </div>
 
+                <div className="space-y-2">
+                  <Label htmlFor="photo">Photo Upload / फोटो अपलोड *</Label>
+                  <div className="border-2 border-dashed border-muted-foreground/50 rounded-lg p-6 text-center hover:border-primary transition-colors cursor-pointer" onClick={() => document.getElementById("photo")?.click()}>
+                    <input
+                      id="photo"
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          setFormData({ ...formData, photoFile: file });
+                        }
+                      }}
+                      className="hidden"
+                      data-testid="input-photo"
+                    />
+                    <p className="font-medium text-foreground">
+                      {formData.photoFile ? formData.photoFile.name : "Click to upload or drag and drop"}
+                    </p>
+                    <p className="text-sm text-muted-foreground mt-2">
+                      Passport-sized photo (3x4 cm / 35x45 pixels recommended)
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      पासपोर्ट साइज फोटो (3x4 सेमी / 35x45 पिक्सल अनुशंसित)
+                    </p>
+                  </div>
+                  <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 p-3 rounded-lg">
+                    <p className="text-sm text-blue-800 dark:text-blue-200">
+                      <strong>Important / महत्वपूर्ण:</strong> Please attach a clear passport-sized photograph (35x45mm).
+                      The photo should be recent, clear, and with a white background.
+                      कृपया एक स्पष्ट पासपोर्ट आकार की फोटो (35x45 मिमी) संलग्न करें।
+                    </p>
+                  </div>
+                </div>
+
                 <div className="bg-secondary/10 p-4 rounded-lg">
                   <p className="text-lg font-semibold">
                     Registration Fee / रजिस्ट्रेशन शुल्क: <span className="text-secondary">Rs.{selectedFeeLevel?.amount}</span>
