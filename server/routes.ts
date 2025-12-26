@@ -52,22 +52,47 @@ export async function registerRoutes(app: Express): Promise<void> {
     try {
       const { email, password } = req.body;
       const student = await Student.findOne({ email });
-      
+
       if (!student) {
         return res.status(401).json({ error: "Invalid credentials" });
       }
-      
+
       if (!student.isActive) {
         return res.status(403).json({ error: "Account is deactivated" });
       }
-      
+
       const isValid = await bcrypt.compare(password, student.password);
       if (!isValid) {
         return res.status(401).json({ error: "Invalid credentials" });
       }
-      
+
       const token = generateToken({ id: student._id.toString(), email: student.email, role: "student", name: student.fullName });
       res.json({ token, user: { id: student._id, email: student.email, role: "student", name: student.fullName } });
+    } catch (error) {
+      res.status(500).json({ error: "Login failed" });
+    }
+  });
+
+  app.post("/api/auth/volunteer/login", async (req, res) => {
+    try {
+      const { email, password } = req.body;
+      const volunteer = await Volunteer.findOne({ email });
+
+      if (!volunteer) {
+        return res.status(401).json({ error: "Invalid credentials" });
+      }
+
+      if (!volunteer.isActive) {
+        return res.status(403).json({ error: "Account is deactivated" });
+      }
+
+      const isValid = await bcrypt.compare(password, volunteer.password);
+      if (!isValid) {
+        return res.status(401).json({ error: "Invalid credentials" });
+      }
+
+      const token = generateToken({ id: volunteer._id.toString(), email: volunteer.email, role: "volunteer", name: volunteer.fullName });
+      res.json({ token, user: { id: volunteer._id, email: volunteer.email, role: "volunteer", name: volunteer.fullName } });
     } catch (error) {
       res.status(500).json({ error: "Login failed" });
     }
