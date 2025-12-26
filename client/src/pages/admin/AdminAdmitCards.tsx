@@ -460,7 +460,15 @@ export default function AdminAdmitCards() {
                   </div>
                   <Button onClick={handleBulkGenerate} className="w-full" disabled={generating} data-testid="button-generate-bulk">
                     {generating && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-                    Generate for All ({studentsWithoutAdmitCard()} students)
+                    {(() => {
+                      const sequence = classSequences.find(seq => seq.id === bulkFormData.classSequence);
+                      const count = students.filter(s => {
+                        if (!s.rollNumber) return false;
+                        if (!sequence) return true;
+                        return sequence.classes.includes(parseInt(s.class));
+                      }).filter(s => !new Set(admitCards.map(ac => ac.studentId?._id)).has(s._id)).length;
+                      return `Generate for ${sequence?.name || 'All Classes'} (${count} students)`;
+                    })()}
                   </Button>
                 </div>
               </DialogContent>
