@@ -78,7 +78,7 @@ export default function Navbar() {
         }
       }
     } catch (error) {
-      console.error("Error checking admit card setting:", error);
+      // Silently handle errors - admit card feature just won't be available
     }
   };
 
