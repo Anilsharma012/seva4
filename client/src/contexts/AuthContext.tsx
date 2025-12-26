@@ -161,7 +161,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         signup,
         logout,
         isAdmin: user?.role === "admin",
-        isStudent: user?.role === "student"
+        isStudent: user?.role === "student",
+        isVolunteer: user?.role === "volunteer"
       }}
     >
       {children}
