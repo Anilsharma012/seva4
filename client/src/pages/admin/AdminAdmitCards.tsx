@@ -458,11 +458,20 @@ export default function AdminAdmitCards() {
                   </div>
                   <div className="space-y-2">
                     <Label>Exam Center</Label>
-                    <Input 
-                      value={bulkFormData.examCenter} 
+                    <Input
+                      value={bulkFormData.examCenter}
                       onChange={(e) => setBulkFormData({ ...bulkFormData, examCenter: e.target.value })}
                       placeholder="परीक्षा केंद्र"
                       data-testid="input-bulk-exam-center"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Session / सत्र (Optional)</Label>
+                    <Input
+                      value={bulkFormData.session}
+                      onChange={(e) => setBulkFormData({ ...bulkFormData, session: e.target.value })}
+                      placeholder="e.g., Session 2024-25, Spring Session"
+                      data-testid="input-bulk-session"
                     />
                   </div>
                   <Button onClick={handleBulkGenerate} className="w-full" disabled={generating} data-testid="button-generate-bulk">
