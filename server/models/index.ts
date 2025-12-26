@@ -51,6 +51,8 @@ export interface IAdmitCard extends Document {
   examName: string;
   fileUrl: string;
   fileName: string;
+  session?: string;
+  classSequence?: "1-3" | "4-6" | "7-8" | "9-10" | "11-12" | "all";
   uploadedAt: Date;
 }
 
