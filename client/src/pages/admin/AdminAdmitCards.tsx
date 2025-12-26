@@ -58,11 +58,21 @@ export default function AdminAdmitCards() {
 
   const [bulkFormData, setBulkFormData] = useState({
     targetClass: "all",
+    classSequence: "all",
     examName: "Haryana GK Exam 2025",
     examDate: "",
     examTime: "10:00 AM - 12:00 PM",
     examCenter: "",
   });
+
+  const classSequences = [
+    { id: "all", name: "All Classes", classes: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] },
+    { id: "1-3", name: "Classes 1-3", classes: [1, 2, 3] },
+    { id: "4-6", name: "Classes 4-6", classes: [4, 5, 6] },
+    { id: "7-8", name: "Classes 7-8", classes: [7, 8] },
+    { id: "9-10", name: "Classes 9-10", classes: [9, 10] },
+    { id: "11-12", name: "Classes 11-12", classes: [11, 12] },
+  ];
 
   useEffect(() => {
     loadData();
