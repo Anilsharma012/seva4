@@ -21,6 +21,8 @@ import AdminLogin from "./pages/AdminLogin";
 import StudentLogin from "./pages/StudentLogin";
 import StudentRegistration from "./pages/StudentRegistration";
 import StudentDashboard from "./pages/StudentDashboard";
+import VolunteerLogin from "./pages/VolunteerLogin";
+import VolunteerDashboard from "./pages/VolunteerDashboard";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminStudents from "./pages/admin/AdminStudents";
 import AdminRollNumbers from "./pages/admin/AdminRollNumbers";
