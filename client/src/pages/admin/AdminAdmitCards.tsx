@@ -533,11 +533,20 @@ export default function AdminAdmitCards() {
                   </div>
                   <div className="space-y-2">
                     <Label>Exam Center</Label>
-                    <Input 
-                      value={formData.examCenter} 
+                    <Input
+                      value={formData.examCenter}
                       onChange={(e) => setFormData({ ...formData, examCenter: e.target.value })}
                       placeholder="परीक्षा केंद्र"
                       data-testid="input-exam-center"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Session / सत्र (Optional)</Label>
+                    <Input
+                      value={formData.session}
+                      onChange={(e) => setFormData({ ...formData, session: e.target.value })}
+                      placeholder="e.g., Session 2024-25, Spring Session"
+                      data-testid="input-session"
                     />
                   </div>
                   <Button onClick={handleSubmit} className="w-full" data-testid="button-generate-admit-card">Generate Admit Card</Button>
