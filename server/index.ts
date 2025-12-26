@@ -43,6 +43,12 @@ app.use((req, res, next) => {
 (async () => {
   await connectDB();
   await seedDatabase();
+
+  // Test endpoint to verify API routes work
+  app.get("/api/test", (req, res) => {
+    res.json({ status: "API routes working" });
+  });
+
   await registerRoutes(app);
 
   app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
