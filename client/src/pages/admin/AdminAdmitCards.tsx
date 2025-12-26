@@ -54,6 +54,7 @@ export default function AdminAdmitCards() {
     examDate: "",
     examTime: "10:00 AM - 12:00 PM",
     examCenter: "",
+    session: "",
   });
 
   const [bulkFormData, setBulkFormData] = useState({
@@ -63,6 +64,7 @@ export default function AdminAdmitCards() {
     examDate: "",
     examTime: "10:00 AM - 12:00 PM",
     examCenter: "",
+    session: "",
   });
 
   const classSequences = [
