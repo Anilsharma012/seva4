@@ -1,8 +1,8 @@
 import type { Express } from "express";
 import bcrypt from "bcryptjs";
-import { 
+import {
   Admin, Student, Result, AdmitCard, Membership, MenuItem, AdminSetting,
-  PaymentConfig, ContentSection, VolunteerApplication, FeeStructure, MembershipCard, Page, ContactInquiry
+  PaymentConfig, ContentSection, VolunteerApplication, Volunteer, FeeStructure, MembershipCard, Page, ContactInquiry
 } from "./models";
 import { authMiddleware, adminOnly, generateToken, AuthRequest } from "./middleware/auth";
 
