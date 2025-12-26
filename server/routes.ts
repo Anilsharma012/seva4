@@ -7,7 +7,8 @@ import {
 import { authMiddleware, adminOnly, generateToken, AuthRequest } from "./middleware/auth";
 
 export async function registerRoutes(app: Express): Promise<void> {
-  
+  console.log("🚀 Registering API routes...");
+
   app.post("/api/auth/admin/login", async (req, res) => {
     try {
       const { email, password } = req.body;
