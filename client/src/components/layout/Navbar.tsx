@@ -92,8 +92,14 @@ export default function Navbar() {
     try {
       const res = await fetch(`/api/public/admit-card/${rollNumber}`);
       if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error.message || "Admit card not found");
+        let errorMessage = "Admit card not found";
+        try {
+          const error = await res.json();
+          errorMessage = error.message || error.error || errorMessage;
+        } catch {
+          // Response was not JSON, use default message
+        }
+        throw new Error(errorMessage);
       }
 
       const data = await res.json();
