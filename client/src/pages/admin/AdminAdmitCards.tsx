@@ -392,19 +392,34 @@ export default function AdminAdmitCards() {
                 </DialogHeader>
                 <div className="space-y-4 py-4">
                   <div className="space-y-2">
-                    <Label>Target Class</Label>
-                    <Select value={bulkFormData.targetClass} onValueChange={(v) => setBulkFormData({ ...bulkFormData, targetClass: v })}>
-                      <SelectTrigger data-testid="select-bulk-class">
-                        <SelectValue placeholder="All Classes" />
+                    <Label>Class Sequence / कक्षा अनुक्रम</Label>
+                    <Select value={bulkFormData.classSequence} onValueChange={(v) => setBulkFormData({ ...bulkFormData, classSequence: v })}>
+                      <SelectTrigger data-testid="select-bulk-sequence">
+                        <SelectValue placeholder="Select Sequence" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="all">All Classes ({studentsWithoutAdmitCard()} pending)</SelectItem>
-                        {[1,2,3,4,5,6,7,8,9,10,11,12].map(c => (
-                          <SelectItem key={c} value={c.toString()}>Class {c}</SelectItem>
+                        {classSequences.map(seq => (
+                          <SelectItem key={seq.id} value={seq.id}>{seq.name}</SelectItem>
                         ))}
+                        <SelectItem value="custom">Custom Class</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
+                  {bulkFormData.classSequence === "custom" && (
+                    <div className="space-y-2">
+                      <Label>Select Specific Class</Label>
+                      <Select value={bulkFormData.targetClass} onValueChange={(v) => setBulkFormData({ ...bulkFormData, targetClass: v })}>
+                        <SelectTrigger data-testid="select-bulk-class">
+                          <SelectValue placeholder="Choose Class" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {[1,2,3,4,5,6,7,8,9,10,11,12].map(c => (
+                            <SelectItem key={c} value={c.toString()}>Class {c}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
                   <div className="space-y-2">
                     <Label>Exam Name</Label>
                     <Input 
