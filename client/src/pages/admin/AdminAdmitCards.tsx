@@ -148,11 +148,22 @@ export default function AdminAdmitCards() {
   const handleBulkGenerate = async () => {
     setGenerating(true);
     const token = localStorage.getItem("auth_token");
-    
+
+    // Get the selected sequence or use individual class selection
+    let selectedClasses: number[] = [];
+    if (bulkFormData.classSequence !== "all" && bulkFormData.classSequence !== "custom") {
+      const sequence = classSequences.find(seq => seq.id === bulkFormData.classSequence);
+      selectedClasses = sequence?.classes || [];
+    } else if (bulkFormData.classSequence === "custom" && bulkFormData.targetClass !== "all") {
+      selectedClasses = [parseInt(bulkFormData.targetClass)];
+    }
+
     const targetStudents = students.filter(s => {
       if (!s.rollNumber) return false;
-      if (bulkFormData.targetClass === "all") return true;
-      return s.class === bulkFormData.targetClass;
+      if (selectedClasses.length > 0) {
+        return selectedClasses.includes(parseInt(s.class));
+      }
+      return true;
     });
 
     const existingStudentIds = new Set(admitCards.map(ac => ac.studentId?._id));
