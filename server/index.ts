@@ -44,6 +44,14 @@ app.use((req, res, next) => {
   await connectDB();
   await seedDatabase();
 
+  if (process.env.NODE_ENV === "development") {
+    // In development: set up Vite FIRST, then API routes (API routes will still take precedence)
+    await setupVite(app);
+  } else {
+    // In production: just serve static files
+    serveStatic(app);
+  }
+
   // Test endpoint to verify API routes work
   app.get("/api/test", (req, res) => {
     res.json({ status: "API routes working" });
@@ -58,12 +66,6 @@ app.use((req, res, next) => {
     res.status(status).json({ message });
     throw err;
   });
-
-  if (process.env.NODE_ENV === "development") {
-    await setupVite(app);
-  } else {
-    serveStatic(app);
-  }
 
   const port = 5000;
   app.listen(port, "0.0.0.0", () => {
