@@ -182,21 +182,24 @@ export default function AdminAdmitCards() {
         examDate: bulkFormData.examDate,
         examTime: bulkFormData.examTime,
         examCenter: bulkFormData.examCenter,
+        session: bulkFormData.session,
         generatedAt: new Date().toISOString(),
       });
 
       try {
         const res = await fetch("/api/admit-cards", {
           method: "POST",
-          headers: { 
+          headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}` 
+            Authorization: `Bearer ${token}`
           },
           body: JSON.stringify({
             studentId: student._id,
             examName: bulkFormData.examName,
             fileUrl: fileData,
             fileName: `admit_card_${student.rollNumber || student.registrationNumber}.json`,
+            session: bulkFormData.session,
+            classSequence: bulkFormData.classSequence,
           }),
         });
 
