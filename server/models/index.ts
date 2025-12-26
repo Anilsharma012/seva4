@@ -361,6 +361,25 @@ const VolunteerApplicationSchema = new Schema<IVolunteerApplication>({
   message: String,
   status: { type: String, enum: ["pending", "approved", "rejected"], default: "pending" },
   adminNotes: String,
+  loginCreated: { type: Boolean, default: false },
+  volunteerId: { type: Schema.Types.ObjectId, ref: "Volunteer" },
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now },
+});
+
+const VolunteerSchema = new Schema<IVolunteer>({
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  fullName: { type: String, required: true },
+  phone: { type: String, required: true },
+  address: String,
+  city: String,
+  occupation: String,
+  skills: String,
+  availability: String,
+  qrCodeUrl: String,
+  upiId: String,
+  isActive: { type: Boolean, default: true },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });
