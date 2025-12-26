@@ -71,7 +71,7 @@ export default function AdminLogin() {
                 <Input
                   id="email"
                   type="email"
-                  placeholder="admin@manavwelfare.org"
+                  placeholder="admin@mwss.org"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -101,8 +101,11 @@ export default function AdminLogin() {
                 {isLoading ? "Loading..." : "Login"}
               </Button>
             </form>
-            <div className="mt-4 text-center text-sm text-muted-foreground">
-              <p>Admin access only. Contact administrator for credentials.</p>
+            <div className="mt-6 p-3 bg-muted rounded-md text-center text-xs text-muted-foreground space-y-1">
+              <p className="font-semibold">Dev Credentials:</p>
+              <p>Email: <span className="font-mono text-foreground">admin@mwss.org</span></p>
+              <p>Password: <span className="font-mono text-foreground">Admin@123</span></p>
+              <p className="text-xs pt-2">Admin access only. Contact administrator for production credentials.</p>
             </div>
           </CardContent>
         </Card>
