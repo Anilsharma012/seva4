@@ -1,4 +1,4 @@
-import express, { type Request, Response, NextFunction } from "express";
+import express, { type Request, Response, NextFunction, Router } from "express";
 import cors from "cors";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
@@ -6,6 +6,8 @@ import { connectDB } from "./db";
 import { seedDatabase } from "./seed";
 
 const app = express();
+const apiRouter = Router();
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cors());
