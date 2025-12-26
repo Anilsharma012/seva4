@@ -142,9 +142,10 @@ export default function StudentDashboard() {
 <body>
   <div class="header">
     <div class="title">Manav Welfare Seva Society</div>
+    <div class="subtitle">मानव वेलफेयर सेवा सोसायटी, भुना (हरियाणा)</div>
     <div class="subtitle">Reg. No: 01215 | Phone: +91 98126 76818</div>
   </div>
-  <div class="admit-title">ADMIT CARD</div>
+  <div class="admit-title">ADMIT CARD / प्रवेश पत्र</div>
   <div class="details">
     <div class="details-left">
       <div class="row"><span class="label">Roll Number:</span><span class="value">${student?.rollNumber || 'N/A'}</span></div>
