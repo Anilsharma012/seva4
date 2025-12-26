@@ -217,7 +217,7 @@ export default function AdminAdmitCards() {
     });
     
     setIsBulkDialogOpen(false);
-    setBulkFormData({ targetClass: "all", classSequence: "all", examName: "Haryana GK Exam 2025", examDate: "", examTime: "10:00 AM - 12:00 PM", examCenter: "" });
+    setBulkFormData({ targetClass: "all", classSequence: "all", examName: "Haryana GK Exam 2025", examDate: "", examTime: "10:00 AM - 12:00 PM", examCenter: "", session: "" });
     loadData();
   };
 
