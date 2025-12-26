@@ -156,7 +156,7 @@ export default function StudentDashboard() {
     </div>
   </div>
   <div class="exam-info">
-    <h3>Exam Details</h3>
+    <h3>Exam Details / परीक्षा विवरण</h3>
     <div class="row"><span class="label">Exam Name:</span><span class="value">${admitData?.examName || card.examName}</span></div>
     <div class="row"><span class="label">Exam Date:</span><span class="value">${admitData?.examDate || 'To be announced'}</span></div>
     <div class="row"><span class="label">Exam Time:</span><span class="value">${admitData?.examTime || 'To be announced'}</span></div>
