@@ -25,24 +25,16 @@ export function log(message: string, source = "express") {
 export async function setupVite(app: Express) {
   const vite = await createViteServer({
     configFile: path.resolve(rootPath, "vite.config.ts"),
-    server: { middlewareMode: true },
+    server: { middlewares: true },
+    appType: "spa",
   });
 
-  // Apply Vite's middleware but skip API routes
-  app.use((req, res, next) => {
-    // Skip Vite middleware for API routes
-    if (req.path.startsWith("/api/")) {
-      return next();
-    }
-    // Use Vite's middleware for everything else (HMR, JS modules, etc.)
-    vite.middlewares(req, res, next);
-  });
+  // Apply Vite's middleware for development server HMR and module serving
+  app.use(vite.middlewares);
 
-  // Fallback: serve index.html for SPA routing (after API routes are handled)
+  // Fallback: serve index.html for SPA routing
   app.use((req, res) => {
-    if (!req.path.startsWith("/api/")) {
-      res.sendFile(path.resolve(clientPath, "index.html"));
-    }
+    res.sendFile(path.resolve(clientPath, "index.html"));
   });
 }
 
