@@ -617,9 +617,83 @@ export async function registerRoutes(app: Express): Promise<void> {
 
   app.patch("/api/admin/volunteers/:id", authMiddleware, adminOnly, async (req: AuthRequest, res) => {
     try {
-      const volunteer = await VolunteerApplication.findByIdAndUpdate(req.params.id, { ...req.body, updatedAt: new Date() }, { new: true });
+      const { status, adminNotes } = req.body;
+      const volunteer = await VolunteerApplication.findById(req.params.id);
+
       if (!volunteer) return res.status(404).json({ error: "Volunteer not found" });
-      res.json(volunteer);
+
+      // If approving volunteer and login hasn't been created yet
+      if (status === "approved" && !volunteer.loginCreated && volunteer.email) {
+        try {
+          // Check if volunteer already exists
+          const existingVolunteer = await Volunteer.findOne({ email: volunteer.email });
+
+          if (!existingVolunteer) {
+            // Generate a temporary password
+            const tempPassword = Math.random().toString(36).slice(-10);
+            const hashedPassword = await bcrypt.hash(tempPassword, 10);
+
+            // Create volunteer account
+            const newVolunteer = new Volunteer({
+              email: volunteer.email,
+              password: hashedPassword,
+              fullName: volunteer.fullName,
+              phone: volunteer.phone,
+              address: volunteer.address,
+              city: volunteer.city,
+              occupation: volunteer.occupation,
+              skills: volunteer.skills,
+              availability: volunteer.availability,
+            });
+            await newVolunteer.save();
+
+            // Update volunteer application with login created flag and volunteer ID
+            const updated = await VolunteerApplication.findByIdAndUpdate(
+              req.params.id,
+              {
+                status,
+                adminNotes,
+                loginCreated: true,
+                volunteerId: newVolunteer._id,
+                updatedAt: new Date()
+              },
+              { new: true }
+            );
+
+            return res.json({
+              ...updated?.toObject(),
+              message: "Volunteer approved and login account created",
+              tempPassword: tempPassword,
+              loginEmail: volunteer.email
+            });
+          } else {
+            // If volunteer account already exists, just update the application
+            const updated = await VolunteerApplication.findByIdAndUpdate(
+              req.params.id,
+              {
+                status,
+                adminNotes,
+                loginCreated: true,
+                volunteerId: existingVolunteer._id,
+                updatedAt: new Date()
+              },
+              { new: true }
+            );
+            return res.json(updated);
+          }
+        } catch (error) {
+          console.error("Error creating volunteer account:", error);
+          return res.status(500).json({ error: "Failed to create volunteer account" });
+        }
+      }
+
+      // For other status updates or when login already exists
+      const updated = await VolunteerApplication.findByIdAndUpdate(
+        req.params.id,
+        { status, adminNotes, updatedAt: new Date() },
+        { new: true }
+      );
+      res.json(updated);
     } catch (error) {
       res.status(500).json({ error: "Failed to update volunteer" });
     }
