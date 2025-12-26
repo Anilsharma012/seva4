@@ -141,7 +141,7 @@ export default function AdminAdmitCards() {
 
       toast({ title: "Admit Card Generated", description: `${student.fullName}` });
       setIsAddDialogOpen(false);
-      setFormData({ studentId: "", examName: "Haryana GK Exam 2025", examDate: "", examTime: "10:00 AM - 12:00 PM", examCenter: "" });
+      setFormData({ studentId: "", examName: "Haryana GK Exam 2025", examDate: "", examTime: "10:00 AM - 12:00 PM", examCenter: "", session: "" });
       loadData();
     } catch (error) {
       console.error("Error generating admit card:", error);
