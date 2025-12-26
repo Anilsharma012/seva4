@@ -1104,4 +1104,6 @@ export async function registerRoutes(app: Express): Promise<void> {
       res.status(500).json({ error: "Failed to fetch volunteer details" });
     }
   });
+
+  console.log("✅ API routes registered successfully!");
 }
