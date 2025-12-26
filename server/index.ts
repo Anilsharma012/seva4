@@ -46,20 +46,25 @@ app.use((req, res, next) => {
   await connectDB();
   await seedDatabase();
 
+  // Register API routes on the apiRouter first
+  // Test endpoint to verify API routes work
+  apiRouter.get("/api/test", (req, res) => {
+    res.json({ status: "API routes working" });
+  });
+
+  // Register all other API routes
+  await registerRoutes(apiRouter);
+
+  // Mount the API router BEFORE Vite middleware
+  app.use(apiRouter);
+
   if (process.env.NODE_ENV === "development") {
-    // In development: set up Vite FIRST, then API routes (API routes will still take precedence)
+    // In development: set up Vite after API routes
     await setupVite(app);
   } else {
     // In production: just serve static files
     serveStatic(app);
   }
-
-  // Test endpoint to verify API routes work
-  app.get("/api/test", (req, res) => {
-    res.json({ status: "API routes working" });
-  });
-
-  await registerRoutes(app);
 
   app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
     const status = (err as { status?: number }).status || (err as { statusCode?: number }).statusCode || 500;
