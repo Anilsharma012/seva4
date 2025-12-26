@@ -21,6 +21,8 @@ import AdminLogin from "./pages/AdminLogin";
 import StudentLogin from "./pages/StudentLogin";
 import StudentRegistration from "./pages/StudentRegistration";
 import StudentDashboard from "./pages/StudentDashboard";
+import VolunteerLogin from "./pages/VolunteerLogin";
+import VolunteerDashboard from "./pages/VolunteerDashboard";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminStudents from "./pages/admin/AdminStudents";
 import AdminRollNumbers from "./pages/admin/AdminRollNumbers";
@@ -61,8 +63,11 @@ const App = () => (
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/student/login" element={<StudentLogin />} />
             <Route path="/student/register" element={<StudentRegistration />} />
+            <Route path="/volunteer/login" element={<VolunteerLogin />} />
             {/* Student Dashboard */}
             <Route path="/student/dashboard" element={<StudentDashboard />} />
+            {/* Volunteer Dashboard */}
+            <Route path="/volunteer/dashboard" element={<VolunteerDashboard />} />
             {/* Admin Dashboard */}
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
             <Route path="/admin/students" element={<AdminStudents />} />

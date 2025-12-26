@@ -51,6 +51,8 @@ export interface IAdmitCard extends Document {
   examName: string;
   fileUrl: string;
   fileName: string;
+  session?: string;
+  classSequence?: "1-3" | "4-6" | "7-8" | "9-10" | "11-12" | "all";
   uploadedAt: Date;
 }
 
@@ -136,6 +138,25 @@ export interface IVolunteerApplication extends Document {
   message?: string;
   status: "pending" | "approved" | "rejected";
   adminNotes?: string;
+  loginCreated: boolean;
+  volunteerId?: mongoose.Types.ObjectId;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface IVolunteer extends Document {
+  email: string;
+  password: string;
+  fullName: string;
+  phone: string;
+  address?: string;
+  city?: string;
+  occupation?: string;
+  skills?: string;
+  availability?: string;
+  qrCodeUrl?: string;
+  upiId?: string;
+  isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -245,6 +266,8 @@ const AdmitCardSchema = new Schema<IAdmitCard>({
   examName: { type: String, required: true },
   fileUrl: { type: String, required: true },
   fileName: { type: String, required: true },
+  session: String,
+  classSequence: { type: String, enum: ["1-3", "4-6", "7-8", "9-10", "11-12", "all"], default: "all" },
   uploadedAt: { type: Date, default: Date.now },
 });
 
@@ -342,6 +365,25 @@ const VolunteerApplicationSchema = new Schema<IVolunteerApplication>({
   message: String,
   status: { type: String, enum: ["pending", "approved", "rejected"], default: "pending" },
   adminNotes: String,
+  loginCreated: { type: Boolean, default: false },
+  volunteerId: { type: Schema.Types.ObjectId, ref: "Volunteer" },
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now },
+});
+
+const VolunteerSchema = new Schema<IVolunteer>({
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  fullName: { type: String, required: true },
+  phone: { type: String, required: true },
+  address: String,
+  city: String,
+  occupation: String,
+  skills: String,
+  availability: String,
+  qrCodeUrl: String,
+  upiId: String,
+  isActive: { type: Boolean, default: true },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });
@@ -403,6 +445,7 @@ const ContactInquirySchema = new Schema<IContactInquiry>({
 PaymentConfigSchema.pre("save", function () { this.updatedAt = new Date(); });
 ContentSectionSchema.pre("save", function () { this.updatedAt = new Date(); });
 VolunteerApplicationSchema.pre("save", function () { this.updatedAt = new Date(); });
+VolunteerSchema.pre("save", function () { this.updatedAt = new Date(); });
 FeeStructureSchema.pre("save", function () { this.updatedAt = new Date(); });
 MembershipCardSchema.pre("save", function () { this.updatedAt = new Date(); });
 PageSchema.pre("save", function () { this.updatedAt = new Date(); });
@@ -418,6 +461,7 @@ export const AdminSetting = mongoose.model<IAdminSetting>("AdminSetting", AdminS
 export const PaymentConfig = mongoose.model<IPaymentConfig>("PaymentConfig", PaymentConfigSchema);
 export const ContentSection = mongoose.model<IContentSection>("ContentSection", ContentSectionSchema);
 export const VolunteerApplication = mongoose.model<IVolunteerApplication>("VolunteerApplication", VolunteerApplicationSchema);
+export const Volunteer = mongoose.model<IVolunteer>("Volunteer", VolunteerSchema);
 export const FeeStructure = mongoose.model<IFeeStructure>("FeeStructure", FeeStructureSchema);
 export const MembershipCard = mongoose.model<IMembershipCard>("MembershipCard", MembershipCardSchema);
 export const Page = mongoose.model<IPage>("Page", PageSchema);

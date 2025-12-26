@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Layout from "@/components/layout/Layout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { X, ZoomIn } from "lucide-react";
-// Real uploaded images
+import { X, ZoomIn, Loader2 } from "lucide-react";
+// Real uploaded images (fallback)
 import newsWatermelon from "@/assets/news-watermelon.jpeg";
 import freeEducation from "@/assets/free-education-class.jpeg";
 import watermelonDist from "@/assets/watermelon-distribution.jpeg";
@@ -13,7 +13,15 @@ import tributeEvent from "@/assets/tribute-event.jpeg";
 import educationBanner from "@/assets/education-banner.jpeg";
 import chairman from "@/assets/chairman.jpeg";
 
-const categories = [
+interface GalleryItem {
+  id: string;
+  image: string;
+  title: string;
+  category: string;
+  date: string;
+}
+
+const fallbackCategories = [
   { id: "all", label: "All" },
   { id: "events", label: "Events" },
   { id: "health", label: "Health Camps" },
@@ -22,27 +30,50 @@ const categories = [
   { id: "education", label: "Education" },
 ];
 
-const galleryItems = [
-  { id: 1, image: newsWatermelon, title: "तरबूज वितरण - समाचार कवरेज", category: "news", date: "2024" },
-  { id: 2, image: freeEducation, title: "निशुल्क शिक्षा कक्षा - भूना", category: "education", date: "2024" },
-  { id: 3, image: watermelonDist, title: "बच्चों को तरबूज वितरण", category: "events", date: "2024" },
-  { id: 4, image: communityReal, title: "समुदाय सेवा कार्यक्रम", category: "events", date: "2024" },
-  { id: 5, image: eventCeremony, title: "पुरस्कार वितरण समारोह", category: "events", date: "2024" },
-  { id: 6, image: tributeEvent, title: "श्रद्धांजलि कार्यक्रम", category: "events", date: "2024" },
-  { id: 7, image: educationBanner, title: "शिक्षा जागरूकता अभियान", category: "education", date: "2024" },
-  { id: 8, image: chairman, title: "अध्यक्ष श्री सुखविंदर बेस", category: "events", date: "2024" },
-  { id: 9, image: freeEducation, title: "गुरु रविदास धर्मशाला में शिक्षा", category: "education", date: "2023" },
-  { id: 10, image: watermelonDist, title: "ईंट भट्टे पर सेवा", category: "events", date: "2023" },
-  { id: 11, image: communityReal, title: "सामुदायिक सेवा", category: "events", date: "2023" },
-  { id: 12, image: newsWatermelon, title: "पल पल न्यूज में कवरेज", category: "news", date: "2023" },
+const fallbackGalleryItems: GalleryItem[] = [
+  { id: "1", image: newsWatermelon, title: "तरबूज वितरण - समाचार कवरेज", category: "news", date: "2024" },
+  { id: "2", image: freeEducation, title: "निशुल्क शिक्षा कक्षा - भूना", category: "education", date: "2024" },
+  { id: "3", image: watermelonDist, title: "बच्चों को तरबूज वितरण", category: "events", date: "2024" },
+  { id: "4", image: communityReal, title: "समुदाय सेवा कार्यक्रम", category: "events", date: "2024" },
+  { id: "5", image: eventCeremony, title: "पुरस्कार वितरण समारोह", category: "events", date: "2024" },
+  { id: "6", image: tributeEvent, title: "श्रद्धांजलि कार्यक्रम", category: "events", date: "2024" },
+  { id: "7", image: educationBanner, title: "शिक्षा जागरूकता अभियान", category: "education", date: "2024" },
+  { id: "8", image: chairman, title: "अध्यक्ष श्री सुखविंदर बेस", category: "events", date: "2024" },
+  { id: "9", image: freeEducation, title: "गुरु रविदास धर्मशाला में शिक्षा", category: "education", date: "2023" },
+  { id: "10", image: watermelonDist, title: "ईंट भट्टे पर सेवा", category: "events", date: "2023" },
+  { id: "11", image: communityReal, title: "सामुदायिक सेवा", category: "events", date: "2023" },
+  { id: "12", image: newsWatermelon, title: "पल पल न्यूज में कवरेज", category: "news", date: "2023" },
 ];
 
 export default function Gallery() {
   const [activeCategory, setActiveCategory] = useState("all");
-  const [selectedImage, setSelectedImage] = useState<typeof galleryItems[0] | null>(null);
+  const [selectedImage, setSelectedImage] = useState<GalleryItem | null>(null);
+  const [galleryContent, setGalleryContent] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const filteredItems = activeCategory === "all" 
-    ? galleryItems 
+  useEffect(() => {
+    fetchGalleryContent();
+  }, []);
+
+  const fetchGalleryContent = async () => {
+    try {
+      const res = await fetch("/api/public/content/gallery");
+      if (res.ok) {
+        const data = await res.json();
+        setGalleryContent(data);
+      }
+    } catch (error) {
+      console.error("Error fetching gallery content:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const categories = galleryContent?.[0]?.metadata?.categories || fallbackCategories;
+  const galleryItems = fallbackGalleryItems;
+
+  const filteredItems = activeCategory === "all"
+    ? galleryItems
     : galleryItems.filter(item => item.category === activeCategory);
 
   return (

@@ -3,7 +3,7 @@ import { createContext, useContext, useState, useEffect, ReactNode } from "react
 interface AuthUser {
   id: string;
   email: string;
-  role: "admin" | "student" | null;
+  role: "admin" | "student" | "volunteer" | null;
   name?: string;
 }
 
@@ -11,11 +11,12 @@ interface AuthContextType {
   user: AuthUser | null;
   token: string | null;
   isLoading: boolean;
-  login: (email: string, password: string, type?: "admin" | "student") => Promise<{ success: boolean; error?: string }>;
+  login: (email: string, password: string, type?: "admin" | "student" | "volunteer") => Promise<{ success: boolean; error?: string }>;
   signup: (data: StudentRegistrationData) => Promise<{ success: boolean; error?: string; registrationNumber?: string }>;
   logout: () => void;
   isAdmin: boolean;
   isStudent: boolean;
+  isVolunteer: boolean;
 }
 
 interface StudentRegistrationData {
@@ -76,10 +77,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const login = async (email: string, password: string, type: "admin" | "student" = "student"): Promise<{ success: boolean; error?: string }> => {
+  const login = async (email: string, password: string, type: "admin" | "student" | "volunteer" = "student"): Promise<{ success: boolean; error?: string }> => {
     setIsLoading(true);
     try {
-      const endpoint = type === "admin" ? "/api/auth/admin/login" : "/api/auth/student/login";
+      let endpoint = "/api/auth/student/login";
+      if (type === "admin") endpoint = "/api/auth/admin/login";
+      else if (type === "volunteer") endpoint = "/api/auth/volunteer/login";
+
       const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -87,7 +91,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
 
       const data = await res.json();
-      
+
       if (!res.ok) {
         setIsLoading(false);
         return { success: false, error: data.error || "Login failed" };
@@ -157,7 +161,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         signup,
         logout,
         isAdmin: user?.role === "admin",
-        isStudent: user?.role === "student"
+        isStudent: user?.role === "student",
+        isVolunteer: user?.role === "volunteer"
       }}
     >
       {children}

@@ -54,15 +54,27 @@ export default function AdminAdmitCards() {
     examDate: "",
     examTime: "10:00 AM - 12:00 PM",
     examCenter: "",
+    session: "",
   });
 
   const [bulkFormData, setBulkFormData] = useState({
     targetClass: "all",
+    classSequence: "all",
     examName: "Haryana GK Exam 2025",
     examDate: "",
     examTime: "10:00 AM - 12:00 PM",
     examCenter: "",
+    session: "",
   });
+
+  const classSequences = [
+    { id: "all", name: "All Classes", classes: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] },
+    { id: "1-3", name: "Classes 1-3", classes: [1, 2, 3] },
+    { id: "4-6", name: "Classes 4-6", classes: [4, 5, 6] },
+    { id: "7-8", name: "Classes 7-8", classes: [7, 8] },
+    { id: "9-10", name: "Classes 9-10", classes: [9, 10] },
+    { id: "11-12", name: "Classes 11-12", classes: [11, 12] },
+  ];
 
   useEffect(() => {
     loadData();
@@ -106,20 +118,22 @@ export default function AdminAdmitCards() {
         examDate: formData.examDate,
         examTime: formData.examTime,
         examCenter: formData.examCenter,
+        session: formData.session,
         generatedAt: new Date().toISOString(),
       });
 
       const res = await fetch("/api/admit-cards", {
         method: "POST",
-        headers: { 
+        headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}` 
+          Authorization: `Bearer ${token}`
         },
         body: JSON.stringify({
           studentId: formData.studentId,
           examName: formData.examName,
           fileUrl: fileData,
           fileName: `admit_card_${student.rollNumber || student.registrationNumber}.json`,
+          session: formData.session,
         }),
       });
 
@@ -127,7 +141,7 @@ export default function AdminAdmitCards() {
 
       toast({ title: "Admit Card Generated", description: `${student.fullName}` });
       setIsAddDialogOpen(false);
-      setFormData({ studentId: "", examName: "Haryana GK Exam 2025", examDate: "", examTime: "10:00 AM - 12:00 PM", examCenter: "" });
+      setFormData({ studentId: "", examName: "Haryana GK Exam 2025", examDate: "", examTime: "10:00 AM - 12:00 PM", examCenter: "", session: "" });
       loadData();
     } catch (error) {
       console.error("Error generating admit card:", error);
@@ -138,11 +152,22 @@ export default function AdminAdmitCards() {
   const handleBulkGenerate = async () => {
     setGenerating(true);
     const token = localStorage.getItem("auth_token");
-    
+
+    // Get the selected sequence or use individual class selection
+    let selectedClasses: number[] = [];
+    if (bulkFormData.classSequence !== "all" && bulkFormData.classSequence !== "custom") {
+      const sequence = classSequences.find(seq => seq.id === bulkFormData.classSequence);
+      selectedClasses = sequence?.classes || [];
+    } else if (bulkFormData.classSequence === "custom" && bulkFormData.targetClass !== "all") {
+      selectedClasses = [parseInt(bulkFormData.targetClass)];
+    }
+
     const targetStudents = students.filter(s => {
       if (!s.rollNumber) return false;
-      if (bulkFormData.targetClass === "all") return true;
-      return s.class === bulkFormData.targetClass;
+      if (selectedClasses.length > 0) {
+        return selectedClasses.includes(parseInt(s.class));
+      }
+      return true;
     });
 
     const existingStudentIds = new Set(admitCards.map(ac => ac.studentId?._id));
@@ -157,21 +182,24 @@ export default function AdminAdmitCards() {
         examDate: bulkFormData.examDate,
         examTime: bulkFormData.examTime,
         examCenter: bulkFormData.examCenter,
+        session: bulkFormData.session,
         generatedAt: new Date().toISOString(),
       });
 
       try {
         const res = await fetch("/api/admit-cards", {
           method: "POST",
-          headers: { 
+          headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}` 
+            Authorization: `Bearer ${token}`
           },
           body: JSON.stringify({
             studentId: student._id,
             examName: bulkFormData.examName,
             fileUrl: fileData,
             fileName: `admit_card_${student.rollNumber || student.registrationNumber}.json`,
+            session: bulkFormData.session,
+            classSequence: bulkFormData.classSequence,
           }),
         });
 
@@ -189,7 +217,7 @@ export default function AdminAdmitCards() {
     });
     
     setIsBulkDialogOpen(false);
-    setBulkFormData({ targetClass: "all", examName: "Haryana GK Exam 2025", examDate: "", examTime: "10:00 AM - 12:00 PM", examCenter: "" });
+    setBulkFormData({ targetClass: "all", classSequence: "all", examName: "Haryana GK Exam 2025", examDate: "", examTime: "10:00 AM - 12:00 PM", examCenter: "", session: "" });
     loadData();
   };
 
@@ -255,12 +283,24 @@ export default function AdminAdmitCards() {
   </div>
   
   <div class="instructions">
-    <h3>Instructions / निर्देश:</h3>
+    <h3>Important Instructions / महत्वपूर्ण निर्देश:</h3>
+    <h4 style="margin-top: 10px; font-weight: bold; color: #333;">English:</h4>
     <ul>
-      <li>Bring this admit card to the examination center / इस प्रवेश पत्र को परीक्षा केंद्र पर लाएं</li>
-      <li>Bring a valid photo ID / वैध फोटो आईडी साथ लाएं</li>
-      <li>Arrive 30 minutes before exam time / परीक्षा समय से 30 मिनट पहले पहुंचें</li>
-      <li>Electronic devices are not allowed / इलेक्ट्रॉनिक उपकरणों की अनुमति नहीं है</li>
+      <li>This is an important admit card. Keep it safe.</li>
+      <li>Bring this admit card to the examination center along with a valid photo ID.</li>
+      <li>Arrive at the examination center at least 30 minutes before the exam starts.</li>
+      <li>Electronic devices, mobile phones, and calculators are NOT allowed in the exam hall.</li>
+      <li>Follow all instructions given by the exam invigilator.</li>
+      <li>Maintain discipline and decorum during the examination.</li>
+    </ul>
+    <h4 style="margin-top: 15px; font-weight: bold; color: #333;">हिन्दी:</h4>
+    <ul>
+      <li>यह एक महत्वपूर्ण प्रवेश पत्र है। इसे सुरक्षित रखें।</li>
+      <li>इस प्रवेश पत्र को एक वैध फोटो आईडी के साथ परीक्षा केंद्र पर लाएं।</li>
+      <li>परीक्षा शुरू होने से कम से कम 30 मिनट पहले परीक्षा केंद्र पर पहुंचें।</li>
+      <li>परीक्षा हॉल में इलेक्ट्रॉनिक उपकरण, मोबाइल फोन और कैलकुलेटर की अनुमति नहीं है।</li>
+      <li>परीक्षा पर्यवेक्षक द्वारा दिए गए सभी निर्देशों का पालन करें।</li>
+      <li>परीक्षा के दौरान अनुशासन और शालीनता बनाए रखें।</li>
     </ul>
   </div>
   
@@ -359,19 +399,34 @@ export default function AdminAdmitCards() {
                 </DialogHeader>
                 <div className="space-y-4 py-4">
                   <div className="space-y-2">
-                    <Label>Target Class</Label>
-                    <Select value={bulkFormData.targetClass} onValueChange={(v) => setBulkFormData({ ...bulkFormData, targetClass: v })}>
-                      <SelectTrigger data-testid="select-bulk-class">
-                        <SelectValue placeholder="All Classes" />
+                    <Label>Class Sequence / कक्षा अनुक्रम</Label>
+                    <Select value={bulkFormData.classSequence} onValueChange={(v) => setBulkFormData({ ...bulkFormData, classSequence: v })}>
+                      <SelectTrigger data-testid="select-bulk-sequence">
+                        <SelectValue placeholder="Select Sequence" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="all">All Classes ({studentsWithoutAdmitCard()} pending)</SelectItem>
-                        {[1,2,3,4,5,6,7,8,9,10,11,12].map(c => (
-                          <SelectItem key={c} value={c.toString()}>Class {c}</SelectItem>
+                        {classSequences.map(seq => (
+                          <SelectItem key={seq.id} value={seq.id}>{seq.name}</SelectItem>
                         ))}
+                        <SelectItem value="custom">Custom Class</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
+                  {bulkFormData.classSequence === "custom" && (
+                    <div className="space-y-2">
+                      <Label>Select Specific Class</Label>
+                      <Select value={bulkFormData.targetClass} onValueChange={(v) => setBulkFormData({ ...bulkFormData, targetClass: v })}>
+                        <SelectTrigger data-testid="select-bulk-class">
+                          <SelectValue placeholder="Choose Class" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {[1,2,3,4,5,6,7,8,9,10,11,12].map(c => (
+                            <SelectItem key={c} value={c.toString()}>Class {c}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
                   <div className="space-y-2">
                     <Label>Exam Name</Label>
                     <Input 
@@ -403,16 +458,33 @@ export default function AdminAdmitCards() {
                   </div>
                   <div className="space-y-2">
                     <Label>Exam Center</Label>
-                    <Input 
-                      value={bulkFormData.examCenter} 
+                    <Input
+                      value={bulkFormData.examCenter}
                       onChange={(e) => setBulkFormData({ ...bulkFormData, examCenter: e.target.value })}
                       placeholder="परीक्षा केंद्र"
                       data-testid="input-bulk-exam-center"
                     />
                   </div>
+                  <div className="space-y-2">
+                    <Label>Session / सत्र (Optional)</Label>
+                    <Input
+                      value={bulkFormData.session}
+                      onChange={(e) => setBulkFormData({ ...bulkFormData, session: e.target.value })}
+                      placeholder="e.g., Session 2024-25, Spring Session"
+                      data-testid="input-bulk-session"
+                    />
+                  </div>
                   <Button onClick={handleBulkGenerate} className="w-full" disabled={generating} data-testid="button-generate-bulk">
                     {generating && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-                    Generate for All ({studentsWithoutAdmitCard()} students)
+                    {(() => {
+                      const sequence = classSequences.find(seq => seq.id === bulkFormData.classSequence);
+                      const count = students.filter(s => {
+                        if (!s.rollNumber) return false;
+                        if (!sequence) return true;
+                        return sequence.classes.includes(parseInt(s.class));
+                      }).filter(s => !new Set(admitCards.map(ac => ac.studentId?._id)).has(s._id)).length;
+                      return `Generate for ${sequence?.name || 'All Classes'} (${count} students)`;
+                    })()}
                   </Button>
                 </div>
               </DialogContent>
@@ -470,11 +542,20 @@ export default function AdminAdmitCards() {
                   </div>
                   <div className="space-y-2">
                     <Label>Exam Center</Label>
-                    <Input 
-                      value={formData.examCenter} 
+                    <Input
+                      value={formData.examCenter}
                       onChange={(e) => setFormData({ ...formData, examCenter: e.target.value })}
                       placeholder="परीक्षा केंद्र"
                       data-testid="input-exam-center"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Session / सत्र (Optional)</Label>
+                    <Input
+                      value={formData.session}
+                      onChange={(e) => setFormData({ ...formData, session: e.target.value })}
+                      placeholder="e.g., Session 2024-25, Spring Session"
+                      data-testid="input-session"
                     />
                   </div>
                   <Button onClick={handleSubmit} className="w-full" data-testid="button-generate-admit-card">Generate Admit Card</Button>

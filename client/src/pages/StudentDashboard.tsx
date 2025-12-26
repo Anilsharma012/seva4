@@ -142,9 +142,10 @@ export default function StudentDashboard() {
 <body>
   <div class="header">
     <div class="title">Manav Welfare Seva Society</div>
+    <div class="subtitle">मानव वेलफेयर सेवा सोसायटी, भुना (हरियाणा)</div>
     <div class="subtitle">Reg. No: 01215 | Phone: +91 98126 76818</div>
   </div>
-  <div class="admit-title">ADMIT CARD</div>
+  <div class="admit-title">ADMIT CARD / प्रवेश पत्र</div>
   <div class="details">
     <div class="details-left">
       <div class="row"><span class="label">Roll Number:</span><span class="value">${student?.rollNumber || 'N/A'}</span></div>
@@ -155,19 +156,31 @@ export default function StudentDashboard() {
     </div>
   </div>
   <div class="exam-info">
-    <h3>Exam Details</h3>
+    <h3>Exam Details / परीक्षा विवरण</h3>
     <div class="row"><span class="label">Exam Name:</span><span class="value">${admitData?.examName || card.examName}</span></div>
     <div class="row"><span class="label">Exam Date:</span><span class="value">${admitData?.examDate || 'To be announced'}</span></div>
     <div class="row"><span class="label">Exam Time:</span><span class="value">${admitData?.examTime || 'To be announced'}</span></div>
     <div class="row"><span class="label">Exam Center:</span><span class="value">${admitData?.examCenter || 'To be announced'}</span></div>
   </div>
   <div class="instructions">
-    <h3>Instructions:</h3>
+    <h3>Important Instructions / महत्वपूर्ण निर्देश:</h3>
+    <h4 style="margin-top: 10px; font-weight: bold; color: #333;">English:</h4>
     <ul>
-      <li>Bring this admit card to the examination center</li>
-      <li>Bring a valid photo ID</li>
-      <li>Arrive 30 minutes before exam time</li>
-      <li>Electronic devices are not allowed</li>
+      <li>This is an important admit card. Keep it safe.</li>
+      <li>Bring this admit card to the examination center along with a valid photo ID.</li>
+      <li>Arrive at the examination center at least 30 minutes before the exam starts.</li>
+      <li>Electronic devices, mobile phones, and calculators are NOT allowed in the exam hall.</li>
+      <li>Follow all instructions given by the exam invigilator.</li>
+      <li>Maintain discipline and decorum during the examination.</li>
+    </ul>
+    <h4 style="margin-top: 15px; font-weight: bold; color: #333;">हिन्दी:</h4>
+    <ul>
+      <li>यह एक महत्वपूर्ण प्रवेश पत्र है। इसे सुरक्षित रखें।</li>
+      <li>इस प्रवेश पत्र को एक वैध फोटो आईडी के साथ परीक्षा केंद्र पर लाएं।</li>
+      <li>परीक्षा शुरू होने से कम से कम 30 मिनट पहले परीक्षा केंद्र पर पहुंचें।</li>
+      <li>परीक्षा हॉल में इलेक्ट्रॉनिक उपकरण, मोबाइल फोन और कैलकुलेटर की अनुमति नहीं है।</li>
+      <li>परीक्षा पर्यवेक्षक द्वारा दिए गए सभी निर्देशों का पालन करें।</li>
+      <li>परीक्षा के दौरान अनुशासन और शालीनता बनाए रखें।</li>
     </ul>
   </div>
   <div class="signature">

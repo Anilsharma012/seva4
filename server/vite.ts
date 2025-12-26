@@ -25,11 +25,17 @@ export function log(message: string, source = "express") {
 export async function setupVite(app: Express) {
   const vite = await createViteServer({
     configFile: path.resolve(rootPath, "vite.config.ts"),
-    server: { middlewareMode: true },
+    server: { middlewares: true },
     appType: "spa",
   });
 
+  // Apply Vite's middleware for development server HMR and module serving
   app.use(vite.middlewares);
+
+  // Fallback: serve index.html for SPA routing
+  app.use((req, res) => {
+    res.sendFile(path.resolve(clientPath, "index.html"));
+  });
 }
 
 export function serveStatic(app: Express) {
