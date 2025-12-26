@@ -29,7 +29,13 @@ export async function setupVite(app: Express) {
     appType: "spa",
   });
 
-  app.use(vite.middlewares);
+  // Skip API routes from Vite middleware
+  app.use((req, res, next) => {
+    if (req.path.startsWith("/api/")) {
+      return next();
+    }
+    vite.middlewares(req, res, next);
+  });
 }
 
 export function serveStatic(app: Express) {
