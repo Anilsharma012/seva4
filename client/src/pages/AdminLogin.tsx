@@ -71,7 +71,7 @@ export default function AdminLogin() {
                 <Input
                   id="email"
                   type="email"
-                  placeholder="admin@manavwelfare.org"
+                  placeholder="admin@mwss.org"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
