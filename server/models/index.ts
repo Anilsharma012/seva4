@@ -156,6 +156,10 @@ export interface IVolunteer extends Document {
   availability?: string;
   qrCodeUrl?: string;
   upiId?: string;
+  registrationFee?: number;
+  paymentVerificationStatus?: "pending" | "verified" | "rejected";
+  verifiedBy?: mongoose.Types.ObjectId;
+  verifiedAt?: Date;
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
