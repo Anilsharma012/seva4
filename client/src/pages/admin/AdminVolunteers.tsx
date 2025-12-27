@@ -40,10 +40,16 @@ export default function AdminVolunteers() {
   const [selectedVolunteer, setSelectedVolunteer] = useState<Volunteer | null>(null);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
   const [adminNotes, setAdminNotes] = useState("");
+  const [activeTab, setActiveTab] = useState<"applications" | "payment-verification">("applications");
 
   const { data: volunteers = [], isLoading } = useQuery<Volunteer[]>({
     queryKey: ["/api/admin/volunteers"],
-    enabled: !!token,
+    enabled: !!token && activeTab === "applications",
+  });
+
+  const { data: pendingPaymentVerification = [], isLoading: isLoadingPayment } = useQuery<Volunteer[]>({
+    queryKey: ["/api/admin/volunteers/pending-verification"],
+    enabled: !!token && activeTab === "payment-verification",
   });
 
   const updateMutation = useMutation({
