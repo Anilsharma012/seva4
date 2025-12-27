@@ -96,22 +96,47 @@ export default function Membership() {
     }
 
     setIsProcessing(true);
-    
-    // Simulate verification (in production, this would verify with payment gateway)
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    // Generate membership ID with level prefix
-    const levelPrefix = formData.membershipLevel.toUpperCase().slice(0, 3);
-    const id = `MWSS-${levelPrefix}-${Date.now().toString().slice(-8)}`;
-    setMemberId(id);
-    setIsSuccess(true);
-    setStep(3);
-    setIsProcessing(false);
 
-    toast({
-      title: "भुगतान सत्यापित!",
-      description: `आपकी सदस्यता सक्रिय हो गई है। ID: ${id}`,
-    });
+    try {
+      const response = await fetch("/api/memberships", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          memberName: formData.name,
+          memberEmail: formData.email,
+          memberPhone: formData.phone,
+          memberAddress: formData.address,
+          membershipType: formData.membershipLevel,
+          isActive: true,
+          validFrom: new Date(),
+          validUntil: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
+          transactionId: formData.transactionId,
+          amount: selectedLevel.price
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to create membership");
+      }
+
+      const data = await response.json();
+      setMemberId(data.membershipNumber || data._id);
+      setIsSuccess(true);
+      setStep(3);
+
+      toast({
+        title: "भुगतान सत्यापित!",
+        description: `आपकी सदस्यता सक्रिय हो गई है। ID: ${data.membershipNumber || data._id}`,
+      });
+    } catch (error) {
+      toast({
+        title: "त्रुटि",
+        description: "सदस्यता बनाने में विफल। कृपया पुनः प्रयास करें।",
+        variant: "destructive"
+      });
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   const copyUPI = () => {
