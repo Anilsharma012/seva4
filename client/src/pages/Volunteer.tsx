@@ -180,6 +180,9 @@ export default function Volunteer() {
             village: "",
             occupation: "",
             availability: "",
+            registrationFee: "",
+            upiId: "",
+            qrCodeUrl: "",
             message: "",
             interests: [],
           });
