@@ -422,7 +422,7 @@ export default function Volunteer() {
                 </div>
               )}
 
-              {isSubmitted ? (
+              {isSubmitted && registrationType === "apply" ? (
                 <div className="flex items-center gap-2 text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
                   <CheckCircle className="h-5 w-5" />
                   <span>धन्यवाद! आपका आवेदन सफलतापूर्वक जमा हो गया है। हम जल्द ही संपर्क करेंगे।</span>
@@ -435,7 +435,11 @@ export default function Volunteer() {
                   disabled={isSubmitting}
                 >
                   {isSubmitting ? <Loader2 className="h-5 w-5 mr-2 animate-spin" /> : <Send className="h-5 w-5 mr-2" />}
-                  {isSubmitting ? "Submitting..." : "Submit Registration / पंजीकरण जमा करें"}
+                  {isSubmitting
+                    ? "Processing..."
+                    : registrationType === "register"
+                      ? "Create Account / खाता बनाएं"
+                      : "Submit Application / आवेदन जमा करें"}
                 </Button>
               )}
             </form>
