@@ -407,18 +407,20 @@ export default function Volunteer() {
                 </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-foreground mb-2">
-                  Message / संदेश (Optional)
-                </label>
-                <Textarea
-                  placeholder="कुछ और बताना चाहें तो यहां लिखें..."
-                  value={formData.message}
-                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                  rows={4}
-                  className="bg-background border-border"
-                />
-              </div>
+              {registrationType === "apply" && (
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-2">
+                    Message / संदेश (Optional)
+                  </label>
+                  <Textarea
+                    placeholder="कुछ और बताना चाहें तो यहां लिखें..."
+                    value={formData.message}
+                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                    rows={4}
+                    className="bg-background border-border"
+                  />
+                </div>
+              )}
 
               {isSubmitted ? (
                 <div className="flex items-center gap-2 text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
