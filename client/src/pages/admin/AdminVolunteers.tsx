@@ -97,6 +97,10 @@ export default function AdminVolunteers() {
     updateMutation.mutate({ id, status, notes });
   };
 
+  const verifyPayment = (id: string, verificationStatus: "verified" | "rejected") => {
+    paymentVerificationMutation.mutate({ id, verificationStatus });
+  };
+
   const deleteVolunteer = (id: string) => {
     if (!confirm("Are you sure you want to delete this application?")) return;
     deleteMutation.mutate(id);
