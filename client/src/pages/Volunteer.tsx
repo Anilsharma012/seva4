@@ -121,12 +121,30 @@ export default function Volunteer() {
         if (res.ok) {
           const data = await res.json();
           localStorage.setItem("auth_token", data.token);
-          toast.success("बधाई हो! आपका खाता सफलतापूर्वक बनाया गया है। / Account created successfully!");
+          toast.success("बधाई हो! आपका खाता सफलतापूर्वक बनाया गया है। आपके भुगतान विवरण की प्रशासक द्वारा जांच की जा रही है। / Account created! Waiting for admin verification.");
+
+          // Reset form
+          setFormData({
+            name: "",
+            email: "",
+            password: "",
+            confirmPassword: "",
+            phone: "",
+            city: "",
+            village: "",
+            occupation: "",
+            availability: "",
+            registrationFee: "",
+            upiId: "",
+            qrCodeUrl: "",
+            message: "",
+            interests: [],
+          });
 
           // Auto-redirect to login page
           setTimeout(() => {
             navigate("/volunteer-login");
-          }, 1500);
+          }, 2000);
         } else {
           const data = await res.json();
           toast.error(data.error || "Registration failed / पंजीकरण विफल");
