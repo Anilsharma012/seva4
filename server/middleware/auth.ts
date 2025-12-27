@@ -5,20 +5,20 @@ export interface AuthRequest extends Request {
   user?: {
     id: string;
     email: string;
-    role: "admin" | "student";
+    role: "admin" | "student" | "volunteer";
     name?: string;
   };
 }
 
 const JWT_SECRET = process.env.JWT_SECRET || "default_jwt_secret";
 
-export function generateToken(payload: { id: string; email: string; role: "admin" | "student"; name?: string }): string {
+export function generateToken(payload: { id: string; email: string; role: "admin" | "student" | "volunteer"; name?: string }): string {
   return jwt.sign(payload, JWT_SECRET, { expiresIn: "7d" });
 }
 
-export function verifyToken(token: string): { id: string; email: string; role: "admin" | "student"; name?: string } | null {
+export function verifyToken(token: string): { id: string; email: string; role: "admin" | "student" | "volunteer"; name?: string } | null {
   try {
-    return jwt.verify(token, JWT_SECRET) as { id: string; email: string; role: "admin" | "student"; name?: string };
+    return jwt.verify(token, JWT_SECRET) as { id: string; email: string; role: "admin" | "student" | "volunteer"; name?: string };
   } catch {
     return null;
   }
