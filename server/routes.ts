@@ -149,7 +149,7 @@ export async function registerRoutes(app: Express): Promise<void> {
 
   app.post("/api/auth/volunteer/register", async (req, res) => {
     try {
-      const { email, password, fullName, phone, address, city, occupation, skills, availability, registrationFee } = req.body;
+      const { email, password, fullName, phone, address, city, occupation, skills, availability, registrationFee, qrCodeUrl, upiId } = req.body;
 
       if (!email || !password || !fullName || !phone) {
         return res.status(400).json({ error: "Missing required fields" });
@@ -172,7 +172,9 @@ export async function registerRoutes(app: Express): Promise<void> {
         skills,
         availability,
         registrationFee: registrationFee || 0,
-        paymentVerificationStatus: "pending",
+        qrCodeUrl,
+        upiId,
+        paymentVerificationStatus: (qrCodeUrl || upiId) ? "pending" : "pending",
         isActive: false, // Will be activated after payment verification
       });
       await volunteer.save();
