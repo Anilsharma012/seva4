@@ -55,3 +55,10 @@ export function studentOnly(req: AuthRequest, res: Response, next: NextFunction)
   }
   next();
 }
+
+export function volunteerOnly(req: AuthRequest, res: Response, next: NextFunction) {
+  if (!req.user || req.user.role !== "volunteer") {
+    return res.status(403).json({ error: "Forbidden - Volunteer access required" });
+  }
+  next();
+}
