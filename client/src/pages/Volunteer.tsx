@@ -337,15 +337,42 @@ export default function Volunteer() {
                 </div>
               )}
 
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-2">
+                    Village / गांव (if applicable)
+                  </label>
+                  <Input
+                    type="text"
+                    placeholder="गांव का नाम"
+                    value={formData.village}
+                    onChange={(e) => setFormData({ ...formData, village: e.target.value })}
+                    className="bg-background border-border"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-2">
+                    Occupation / व्यवसाय
+                  </label>
+                  <Input
+                    type="text"
+                    placeholder="आपका व्यवसाय"
+                    value={formData.occupation}
+                    onChange={(e) => setFormData({ ...formData, occupation: e.target.value })}
+                    className="bg-background border-border"
+                  />
+                </div>
+              </div>
+
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">
-                  Village / गांव (if applicable)
+                  Availability / उपलब्धता
                 </label>
                 <Input
                   type="text"
-                  placeholder="गांव का नाम"
-                  value={formData.village}
-                  onChange={(e) => setFormData({ ...formData, village: e.target.value })}
+                  placeholder="आपकी उपलब्धता (e.g., Weekends, Evenings)"
+                  value={formData.availability}
+                  onChange={(e) => setFormData({ ...formData, availability: e.target.value })}
                   className="bg-background border-border"
                 />
               </div>
