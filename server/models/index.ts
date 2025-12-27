@@ -156,6 +156,10 @@ export interface IVolunteer extends Document {
   availability?: string;
   qrCodeUrl?: string;
   upiId?: string;
+  registrationFee?: number;
+  paymentVerificationStatus?: "pending" | "verified" | "rejected";
+  verifiedBy?: mongoose.Types.ObjectId;
+  verifiedAt?: Date;
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -383,6 +387,10 @@ const VolunteerSchema = new Schema<IVolunteer>({
   availability: String,
   qrCodeUrl: String,
   upiId: String,
+  registrationFee: Number,
+  paymentVerificationStatus: { type: String, enum: ["pending", "verified", "rejected"], default: "pending" },
+  verifiedBy: { type: Schema.Types.ObjectId, ref: "Admin" },
+  verifiedAt: Date,
   isActive: { type: Boolean, default: true },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },

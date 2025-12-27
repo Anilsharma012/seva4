@@ -23,8 +23,13 @@ interface Volunteer {
   skills?: string;
   availability?: string;
   message?: string;
-  status: "pending" | "approved" | "rejected";
+  status?: "pending" | "approved" | "rejected";
   adminNotes?: string;
+  registrationFee?: number;
+  upiId?: string;
+  qrCodeUrl?: string;
+  paymentVerificationStatus?: "pending" | "verified" | "rejected";
+  verifiedAt?: string;
   createdAt: string;
 }
 
@@ -35,10 +40,16 @@ export default function AdminVolunteers() {
   const [selectedVolunteer, setSelectedVolunteer] = useState<Volunteer | null>(null);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
   const [adminNotes, setAdminNotes] = useState("");
+  const [activeTab, setActiveTab] = useState<"applications" | "payment-verification">("applications");
 
   const { data: volunteers = [], isLoading } = useQuery<Volunteer[]>({
     queryKey: ["/api/admin/volunteers"],
-    enabled: !!token,
+    enabled: !!token && activeTab === "applications",
+  });
+
+  const { data: pendingPaymentVerification = [], isLoading: isLoadingPayment } = useQuery<Volunteer[]>({
+    queryKey: ["/api/admin/volunteers/pending-verification"],
+    enabled: !!token && activeTab === "payment-verification",
   });
 
   const updateMutation = useMutation({
@@ -68,8 +79,26 @@ export default function AdminVolunteers() {
     },
   });
 
+  const paymentVerificationMutation = useMutation({
+    mutationFn: async ({ id, verificationStatus }: { id: string; verificationStatus: "verified" | "rejected" }) => {
+      return apiRequest("PATCH", `/api/admin/volunteer-payment/${id}/verify`, { verificationStatus, adminNotes });
+    },
+    onSuccess: () => {
+      toast({ title: "Success", description: "Payment verification updated" });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/volunteers/pending-verification"] });
+      setViewDialogOpen(false);
+    },
+    onError: () => {
+      toast({ title: "Error", description: "Failed to update verification", variant: "destructive" });
+    },
+  });
+
   const updateStatus = (id: string, status: string, notes?: string) => {
     updateMutation.mutate({ id, status, notes });
+  };
+
+  const verifyPayment = (id: string, verificationStatus: "verified" | "rejected") => {
+    paymentVerificationMutation.mutate({ id, verificationStatus });
   };
 
   const deleteVolunteer = (id: string) => {
@@ -105,53 +134,132 @@ export default function AdminVolunteers() {
     <AdminLayout>
       <div className="p-6 space-y-6">
         <div className="flex items-center justify-between gap-4 flex-wrap">
-          <h1 className="text-2xl font-bold" data-testid="text-page-title">Volunteer Applications</h1>
+          <h1 className="text-2xl font-bold" data-testid="text-page-title">Volunteer Management</h1>
         </div>
 
-        {isLoading ? (
-          <div className="flex items-center justify-center py-12" data-testid="loading-spinner">
-            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-          </div>
-        ) : volunteers.length === 0 ? (
-          <Card data-testid="card-empty-state">
-            <CardContent className="py-12 text-center text-muted-foreground">
-              No volunteer applications yet
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="grid gap-4" data-testid="list-volunteers">
-            {volunteers.map((volunteer) => (
-              <Card key={volunteer._id} data-testid={`card-volunteer-${volunteer._id}`}>
-                <CardContent className="p-4">
-                  <div className="flex items-start justify-between gap-4 flex-wrap">
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-semibold" data-testid={`text-name-${volunteer._id}`}>{volunteer.fullName}</span>
-                        {getStatusBadge(volunteer.status)}
-                      </div>
-                      <p className="text-sm text-muted-foreground" data-testid={`text-email-${volunteer._id}`}>{volunteer.email}</p>
-                      <p className="text-sm text-muted-foreground" data-testid={`text-phone-${volunteer._id}`}>{volunteer.phone}</p>
-                      {volunteer.city && <p className="text-sm text-muted-foreground">{volunteer.city}</p>}
-                    </div>
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <Button size="icon" variant="outline" onClick={() => openViewDialog(volunteer)} data-testid={`button-view-${volunteer._id}`}>
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button size="icon" variant="outline" className="text-green-600" onClick={() => updateStatus(volunteer._id, "approved")} disabled={updateMutation.isPending} data-testid={`button-approve-${volunteer._id}`}>
-                        <Check className="h-4 w-4" />
-                      </Button>
-                      <Button size="icon" variant="outline" className="text-red-600" onClick={() => updateStatus(volunteer._id, "rejected")} disabled={updateMutation.isPending} data-testid={`button-reject-${volunteer._id}`}>
-                        <X className="h-4 w-4" />
-                      </Button>
-                      <Button size="icon" variant="destructive" onClick={() => deleteVolunteer(volunteer._id)} disabled={deleteMutation.isPending} data-testid={`button-delete-${volunteer._id}`}>
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
+        {/* Tabs */}
+        <div className="flex gap-2 border-b border-border">
+          <Button
+            variant={activeTab === "applications" ? "default" : "ghost"}
+            onClick={() => setActiveTab("applications")}
+            className="px-4"
+          >
+            Applications
+          </Button>
+          <Button
+            variant={activeTab === "payment-verification" ? "default" : "ghost"}
+            onClick={() => setActiveTab("payment-verification")}
+            className="px-4"
+          >
+            Payment Verification
+          </Button>
+        </div>
+
+        {/* Volunteer Applications Tab */}
+        {activeTab === "applications" && (
+          <>
+            {isLoading ? (
+              <div className="flex items-center justify-center py-12" data-testid="loading-spinner">
+                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+              </div>
+            ) : volunteers.length === 0 ? (
+              <Card data-testid="card-empty-state">
+                <CardContent className="py-12 text-center text-muted-foreground">
+                  No volunteer applications yet
                 </CardContent>
               </Card>
-            ))}
-          </div>
+            ) : (
+              <div className="grid gap-4" data-testid="list-volunteers">
+                {volunteers.map((volunteer) => (
+                  <Card key={volunteer._id} data-testid={`card-volunteer-${volunteer._id}`}>
+                    <CardContent className="p-4">
+                      <div className="flex items-start justify-between gap-4 flex-wrap">
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="font-semibold" data-testid={`text-name-${volunteer._id}`}>{volunteer.fullName}</span>
+                            {getStatusBadge(volunteer.status)}
+                          </div>
+                          <p className="text-sm text-muted-foreground" data-testid={`text-email-${volunteer._id}`}>{volunteer.email}</p>
+                          <p className="text-sm text-muted-foreground" data-testid={`text-phone-${volunteer._id}`}>{volunteer.phone}</p>
+                          {volunteer.city && <p className="text-sm text-muted-foreground">{volunteer.city}</p>}
+                        </div>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <Button size="icon" variant="outline" onClick={() => openViewDialog(volunteer)} data-testid={`button-view-${volunteer._id}`}>
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button size="icon" variant="outline" className="text-green-600" onClick={() => updateStatus(volunteer._id, "approved")} disabled={updateMutation.isPending} data-testid={`button-approve-${volunteer._id}`}>
+                            <Check className="h-4 w-4" />
+                          </Button>
+                          <Button size="icon" variant="outline" className="text-red-600" onClick={() => updateStatus(volunteer._id, "rejected")} disabled={updateMutation.isPending} data-testid={`button-reject-${volunteer._id}`}>
+                            <X className="h-4 w-4" />
+                          </Button>
+                          <Button size="icon" variant="destructive" onClick={() => deleteVolunteer(volunteer._id)} disabled={deleteMutation.isPending} data-testid={`button-delete-${volunteer._id}`}>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </>
+        )}
+
+        {/* Payment Verification Tab */}
+        {activeTab === "payment-verification" && (
+          <>
+            {isLoadingPayment ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+              </div>
+            ) : pendingPaymentVerification.length === 0 ? (
+              <Card>
+                <CardContent className="py-12 text-center text-muted-foreground">
+                  No volunteers pending payment verification
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="grid gap-4">
+                {pendingPaymentVerification.map((volunteer) => (
+                  <Card key={volunteer._id}>
+                    <CardContent className="p-4">
+                      <div className="flex items-start justify-between gap-4 flex-wrap">
+                        <div className="space-y-2 flex-1">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="font-semibold">{volunteer.fullName}</span>
+                            <Badge variant="secondary">Pending Verification</Badge>
+                          </div>
+                          <p className="text-sm text-muted-foreground">{volunteer.email}</p>
+                          <p className="text-sm text-muted-foreground">{volunteer.phone}</p>
+                          {volunteer.registrationFee && (
+                            <p className="text-sm font-medium">Registration Fee: ₹{volunteer.registrationFee}</p>
+                          )}
+                          {volunteer.upiId && (
+                            <p className="text-sm text-muted-foreground">UPI ID: {volunteer.upiId}</p>
+                          )}
+                          {volunteer.qrCodeUrl && (
+                            <p className="text-sm text-muted-foreground">QR Code: <a href={volunteer.qrCodeUrl} target="_blank" className="text-primary underline">View</a></p>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <Button size="icon" variant="outline" onClick={() => openViewDialog(volunteer)}>
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button size="icon" variant="outline" className="text-green-600" onClick={() => verifyPayment(volunteer._id, "verified")} disabled={paymentVerificationMutation.isPending}>
+                            <Check className="h-4 w-4" />
+                          </Button>
+                          <Button size="icon" variant="outline" className="text-red-600" onClick={() => verifyPayment(volunteer._id, "rejected")} disabled={paymentVerificationMutation.isPending}>
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </>
         )}
 
         <Dialog open={viewDialogOpen} onOpenChange={setViewDialogOpen}>

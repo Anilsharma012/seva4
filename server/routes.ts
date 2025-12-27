@@ -4,7 +4,7 @@ import {
   Admin, Student, Result, AdmitCard, Membership, MenuItem, AdminSetting,
   PaymentConfig, ContentSection, VolunteerApplication, Volunteer, FeeStructure, MembershipCard, Page, ContactInquiry
 } from "./models";
-import { authMiddleware, adminOnly, generateToken, AuthRequest } from "./middleware/auth";
+import { authMiddleware, adminOnly, volunteerOnly, generateToken, AuthRequest } from "./middleware/auth";
 
 export async function registerRoutes(app: Express): Promise<void> {
   console.log("🚀 Registering API routes...");
@@ -83,6 +83,10 @@ export async function registerRoutes(app: Express): Promise<void> {
         return res.status(401).json({ error: "Invalid credentials" });
       }
 
+      if (volunteer.paymentVerificationStatus !== "verified") {
+        return res.status(403).json({ error: "Your account is pending payment verification. Please check back later." });
+      }
+
       if (!volunteer.isActive) {
         return res.status(403).json({ error: "Account is deactivated" });
       }
@@ -143,12 +147,56 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   });
 
+  app.post("/api/auth/volunteer/register", async (req, res) => {
+    try {
+      const { email, password, fullName, phone, address, city, occupation, skills, availability, registrationFee, qrCodeUrl, upiId } = req.body;
+
+      if (!email || !password || !fullName || !phone) {
+        return res.status(400).json({ error: "Missing required fields" });
+      }
+
+      const existing = await Volunteer.findOne({ email });
+      if (existing) {
+        return res.status(400).json({ error: "Email already registered" });
+      }
+
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const volunteer = new Volunteer({
+        email,
+        password: hashedPassword,
+        fullName,
+        phone,
+        address,
+        city,
+        occupation,
+        skills,
+        availability,
+        registrationFee: registrationFee || 0,
+        qrCodeUrl,
+        upiId,
+        paymentVerificationStatus: (qrCodeUrl || upiId) ? "pending" : "pending",
+        isActive: false, // Will be activated after payment verification
+      });
+      await volunteer.save();
+
+      const token = generateToken({ id: volunteer._id.toString(), email: volunteer.email, role: "volunteer", name: volunteer.fullName });
+      res.status(201).json({ token, user: { id: volunteer._id, email: volunteer.email, role: "volunteer", name: volunteer.fullName } });
+    } catch (error) {
+      console.error("Volunteer registration error:", error);
+      res.status(500).json({ error: "Registration failed" });
+    }
+  });
+
   app.get("/api/auth/me", authMiddleware, async (req: AuthRequest, res) => {
     try {
       if (req.user?.role === "admin") {
         const admin = await Admin.findById(req.user.id).select("-password");
         if (!admin) return res.status(404).json({ error: "Admin not found" });
         res.json({ ...admin.toObject(), role: "admin" });
+      } else if (req.user?.role === "volunteer") {
+        const volunteer = await Volunteer.findById(req.user?.id).select("-password");
+        if (!volunteer) return res.status(404).json({ error: "Volunteer not found" });
+        res.json({ ...volunteer.toObject(), role: "volunteer" });
       } else {
         const student = await Student.findById(req.user?.id).select("-password");
         if (!student) return res.status(404).json({ error: "Student not found" });
@@ -1102,6 +1150,42 @@ export async function registerRoutes(app: Express): Promise<void> {
       res.json(volunteer);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch volunteer details" });
+    }
+  });
+
+  // Volunteer Payment Verification (Admin)
+  app.get("/api/admin/volunteers/pending-verification", authMiddleware, adminOnly, async (req: AuthRequest, res) => {
+    try {
+      const volunteers = await Volunteer.find({ paymentVerificationStatus: "pending" }).select("-password").sort({ createdAt: -1 });
+      res.json(volunteers);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch volunteers" });
+    }
+  });
+
+  app.patch("/api/admin/volunteer-payment/:id/verify", authMiddleware, adminOnly, async (req: AuthRequest, res) => {
+    try {
+      const { verificationStatus, adminNotes } = req.body;
+      if (!["verified", "rejected"].includes(verificationStatus)) {
+        return res.status(400).json({ error: "Invalid verification status" });
+      }
+
+      const volunteer = await Volunteer.findByIdAndUpdate(
+        req.params.id,
+        {
+          paymentVerificationStatus: verificationStatus,
+          verifiedBy: req.user?.id,
+          verifiedAt: new Date(),
+          updatedAt: new Date(),
+          isActive: verificationStatus === "verified"
+        },
+        { new: true }
+      ).select("-password");
+
+      if (!volunteer) return res.status(404).json({ error: "Volunteer not found" });
+      res.json(volunteer);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update verification status" });
     }
   });
 
