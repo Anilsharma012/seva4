@@ -5,6 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Users, Heart, BookOpen, Leaf, Stethoscope, HandHeart, GraduationCap, Send, Phone, Loader2, CheckCircle } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "wouter";
 import { toast } from "sonner";
 
 const interestAreas = [
