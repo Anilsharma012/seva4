@@ -1145,5 +1145,41 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   });
 
+  // Volunteer Payment Verification (Admin)
+  app.get("/api/admin/volunteers/pending-verification", authMiddleware, adminOnly, async (req: AuthRequest, res) => {
+    try {
+      const volunteers = await Volunteer.find({ paymentVerificationStatus: "pending" }).select("-password").sort({ createdAt: -1 });
+      res.json(volunteers);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch volunteers" });
+    }
+  });
+
+  app.patch("/api/admin/volunteer-payment/:id/verify", authMiddleware, adminOnly, async (req: AuthRequest, res) => {
+    try {
+      const { verificationStatus, adminNotes } = req.body;
+      if (!["verified", "rejected"].includes(verificationStatus)) {
+        return res.status(400).json({ error: "Invalid verification status" });
+      }
+
+      const volunteer = await Volunteer.findByIdAndUpdate(
+        req.params.id,
+        {
+          paymentVerificationStatus: verificationStatus,
+          verifiedBy: req.user?.id,
+          verifiedAt: new Date(),
+          updatedAt: new Date(),
+          isActive: verificationStatus === "verified"
+        },
+        { new: true }
+      ).select("-password");
+
+      if (!volunteer) return res.status(404).json({ error: "Volunteer not found" });
+      res.json(volunteer);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update verification status" });
+    }
+  });
+
   console.log("✅ API routes registered successfully!");
 }
