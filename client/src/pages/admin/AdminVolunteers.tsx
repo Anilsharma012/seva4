@@ -79,6 +79,20 @@ export default function AdminVolunteers() {
     },
   });
 
+  const paymentVerificationMutation = useMutation({
+    mutationFn: async ({ id, verificationStatus }: { id: string; verificationStatus: "verified" | "rejected" }) => {
+      return apiRequest("PATCH", `/api/admin/volunteer-payment/${id}/verify`, { verificationStatus, adminNotes });
+    },
+    onSuccess: () => {
+      toast({ title: "Success", description: "Payment verification updated" });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/volunteers/pending-verification"] });
+      setViewDialogOpen(false);
+    },
+    onError: () => {
+      toast({ title: "Error", description: "Failed to update verification", variant: "destructive" });
+    },
+  });
+
   const updateStatus = (id: string, status: string, notes?: string) => {
     updateMutation.mutate({ id, status, notes });
   };
