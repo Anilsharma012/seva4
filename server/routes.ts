@@ -143,6 +143,42 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   });
 
+  app.post("/api/auth/volunteer/register", async (req, res) => {
+    try {
+      const { email, password, fullName, phone, address, city, occupation, skills, availability } = req.body;
+
+      if (!email || !password || !fullName || !phone) {
+        return res.status(400).json({ error: "Missing required fields" });
+      }
+
+      const existing = await Volunteer.findOne({ email });
+      if (existing) {
+        return res.status(400).json({ error: "Email already registered" });
+      }
+
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const volunteer = new Volunteer({
+        email,
+        password: hashedPassword,
+        fullName,
+        phone,
+        address,
+        city,
+        occupation,
+        skills,
+        availability,
+        isActive: true,
+      });
+      await volunteer.save();
+
+      const token = generateToken({ id: volunteer._id.toString(), email: volunteer.email, role: "volunteer", name: volunteer.fullName });
+      res.status(201).json({ token, user: { id: volunteer._id, email: volunteer.email, role: "volunteer", name: volunteer.fullName } });
+    } catch (error) {
+      console.error("Volunteer registration error:", error);
+      res.status(500).json({ error: "Registration failed" });
+    }
+  });
+
   app.get("/api/auth/me", authMiddleware, async (req: AuthRequest, res) => {
     try {
       if (req.user?.role === "admin") {
