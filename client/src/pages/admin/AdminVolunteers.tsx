@@ -23,8 +23,13 @@ interface Volunteer {
   skills?: string;
   availability?: string;
   message?: string;
-  status: "pending" | "approved" | "rejected";
+  status?: "pending" | "approved" | "rejected";
   adminNotes?: string;
+  registrationFee?: number;
+  upiId?: string;
+  qrCodeUrl?: string;
+  paymentVerificationStatus?: "pending" | "verified" | "rejected";
+  verifiedAt?: string;
   createdAt: string;
 }
 
