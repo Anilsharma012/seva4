@@ -64,43 +64,108 @@ export default function Volunteer() {
     }));
   };
 
+  const validateForm = () => {
+    if (!formData.name || !formData.email || !formData.phone || !formData.city) {
+      toast.error("कृपया सभी आवश्यक फ़ील्ड भरें / Please fill all required fields");
+      return false;
+    }
+
+    if (registrationType === "register") {
+      if (!formData.password || formData.password.length < 6) {
+        toast.error("पासवर्ड कम से कम 6 वर्ण होना चाहिए / Password must be at least 6 characters");
+        return false;
+      }
+      if (formData.password !== formData.confirmPassword) {
+        toast.error("पासवर्ड मेल नहीं खा रहे हैं / Passwords do not match");
+        return false;
+      }
+    }
+
+    return true;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
+
     setIsSubmitting(true);
-    
+
     try {
-      const res = await fetch("/api/public/volunteer-apply", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          fullName: formData.name,
-          email: formData.email,
-          phone: formData.phone,
-          city: formData.city,
-          address: formData.village,
-          skills: formData.interests.join(", "),
-          message: formData.message,
-        }),
-      });
-      
-      if (res.ok) {
-        setIsSubmitted(true);
-        toast.success("धन्यवाद! आपका पंजीकरण सफल रहा। हम जल्द ही आपसे संपर्क करेंगे।");
-        setFormData({
-          name: "",
-          email: "",
-          phone: "",
-          city: "",
-          village: "",
-          message: "",
-          interests: [],
+      if (registrationType === "register") {
+        // Direct registration with password
+        const res = await fetch("/api/auth/volunteer/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            fullName: formData.name,
+            email: formData.email,
+            password: formData.password,
+            phone: formData.phone,
+            city: formData.city,
+            address: formData.village,
+            occupation: formData.occupation,
+            skills: formData.interests.join(", "),
+            availability: formData.availability,
+          }),
         });
+
+        if (res.ok) {
+          const data = await res.json();
+          localStorage.setItem("auth_token", data.token);
+          toast.success("बधाई हो! आपका खाता सफलतापूर्वक बनाया गया है। / Account created successfully!");
+
+          // Auto-redirect to login page
+          setTimeout(() => {
+            navigate("/volunteer-login");
+          }, 1500);
+        } else {
+          const data = await res.json();
+          toast.error(data.error || "Registration failed / पंजीकरण विफल");
+        }
       } else {
-        const data = await res.json();
-        toast.error(data.error || "Application submission failed");
+        // Application form (for admin approval)
+        const res = await fetch("/api/public/volunteer-apply", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            fullName: formData.name,
+            email: formData.email,
+            phone: formData.phone,
+            city: formData.city,
+            address: formData.village,
+            occupation: formData.occupation,
+            skills: formData.interests.join(", "),
+            availability: formData.availability,
+            message: formData.message,
+          }),
+        });
+
+        if (res.ok) {
+          setIsSubmitted(true);
+          toast.success("धन्यवाद! आपका आवेदन सफल रहा। हम जल्द ही आपसे संपर्क करेंगे। / Thank you! We'll contact you soon.");
+          setFormData({
+            name: "",
+            email: "",
+            password: "",
+            confirmPassword: "",
+            phone: "",
+            city: "",
+            village: "",
+            occupation: "",
+            availability: "",
+            message: "",
+            interests: [],
+          });
+        } else {
+          const data = await res.json();
+          toast.error(data.error || "Application submission failed");
+        }
       }
     } catch (error) {
-      toast.error("Something went wrong. Please try again.");
+      toast.error("Something went wrong. Please try again. / कुछ गलत हुआ");
     } finally {
       setIsSubmitting(false);
     }
