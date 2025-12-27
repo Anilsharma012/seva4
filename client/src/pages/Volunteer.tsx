@@ -36,12 +36,19 @@ const benefits = [
 ];
 
 export default function Volunteer() {
+  const [, navigate] = useNavigate();
+  const [registrationType, setRegistrationType] = useState<"register" | "apply">("register");
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    password: "",
+    confirmPassword: "",
     phone: "",
     city: "",
     village: "",
+    occupation: "",
+    availability: "",
     message: "",
     interests: [] as string[],
   });
