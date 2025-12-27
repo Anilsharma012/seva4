@@ -112,6 +112,9 @@ export default function Volunteer() {
             occupation: formData.occupation,
             skills: formData.interests.join(", "),
             availability: formData.availability,
+            registrationFee: formData.registrationFee ? parseInt(formData.registrationFee) : 0,
+            qrCodeUrl: formData.qrCodeUrl,
+            upiId: formData.upiId,
           }),
         });
 
