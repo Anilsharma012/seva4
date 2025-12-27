@@ -280,13 +280,14 @@ export default function Volunteer() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-2">
-                    Email Address / ईमेल
+                    Email Address / ईमेल *
                   </label>
                   <Input
                     type="email"
                     placeholder="your@email.com"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    required
                     className="bg-background border-border"
                   />
                 </div>
@@ -304,6 +305,37 @@ export default function Volunteer() {
                   />
                 </div>
               </div>
+
+              {registrationType === "register" && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-foreground mb-2">
+                      Password / पासवर्ड *
+                    </label>
+                    <Input
+                      type="password"
+                      placeholder="कम से कम 6 वर्ण"
+                      value={formData.password}
+                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                      required
+                      className="bg-background border-border"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-foreground mb-2">
+                      Confirm Password / पासवर्ड की पुष्टि करें *
+                    </label>
+                    <Input
+                      type="password"
+                      placeholder="पासवर्ड दोहराएं"
+                      value={formData.confirmPassword}
+                      onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                      required
+                      className="bg-background border-border"
+                    />
+                  </div>
+                </div>
+              )}
 
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">
