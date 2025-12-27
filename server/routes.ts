@@ -4,7 +4,7 @@ import {
   Admin, Student, Result, AdmitCard, Membership, MenuItem, AdminSetting,
   PaymentConfig, ContentSection, VolunteerApplication, Volunteer, FeeStructure, MembershipCard, Page, ContactInquiry
 } from "./models";
-import { authMiddleware, adminOnly, generateToken, AuthRequest } from "./middleware/auth";
+import { authMiddleware, adminOnly, volunteerOnly, generateToken, AuthRequest } from "./middleware/auth";
 
 export async function registerRoutes(app: Express): Promise<void> {
   console.log("🚀 Registering API routes...");
