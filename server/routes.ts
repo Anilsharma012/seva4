@@ -83,6 +83,10 @@ export async function registerRoutes(app: Express): Promise<void> {
         return res.status(401).json({ error: "Invalid credentials" });
       }
 
+      if (volunteer.paymentVerificationStatus !== "verified") {
+        return res.status(403).json({ error: "Your account is pending payment verification. Please check back later." });
+      }
+
       if (!volunteer.isActive) {
         return res.status(403).json({ error: "Account is deactivated" });
       }
