@@ -218,11 +218,33 @@ export default function Volunteer() {
           <div className="max-w-3xl mx-auto">
             <div className="text-center mb-12">
               <h2 className="text-3xl font-bold text-foreground mb-4">
-                Volunteer Registration Form
+                Volunteer {registrationType === "register" ? "Registration" : "Application"}
               </h2>
-              <p className="text-muted-foreground">
-                स्वयंसेवक पंजीकरण फॉर्म भरें / Fill the volunteer registration form
+              <p className="text-muted-foreground mb-6">
+                {registrationType === "register"
+                  ? "तुरंत खाता बनाएं / Create account instantly"
+                  : "स्वयंसेवक पंजीकरण फॉर्म भरें / Fill the volunteer application form"}
               </p>
+
+              {/* Registration Type Tabs */}
+              <div className="flex justify-center gap-4 mb-8">
+                <Button
+                  type="button"
+                  variant={registrationType === "register" ? "default" : "outline"}
+                  onClick={() => setRegistrationType("register")}
+                  className="px-6"
+                >
+                  Direct Registration
+                </Button>
+                <Button
+                  type="button"
+                  variant={registrationType === "apply" ? "default" : "outline"}
+                  onClick={() => setRegistrationType("apply")}
+                  className="px-6"
+                >
+                  Apply for Review
+                </Button>
+              </div>
             </div>
 
             <form onSubmit={handleSubmit} className="bg-card rounded-2xl p-8 shadow-card space-y-6">
