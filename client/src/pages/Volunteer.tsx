@@ -310,34 +310,84 @@ export default function Volunteer() {
               </div>
 
               {registrationType === "register" && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">
-                      Password / पासवर्ड *
-                    </label>
-                    <Input
-                      type="password"
-                      placeholder="कम से कम 6 वर्ण"
-                      value={formData.password}
-                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                      required
-                      className="bg-background border-border"
-                    />
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-medium text-foreground mb-2">
+                        Password / पासवर्ड *
+                      </label>
+                      <Input
+                        type="password"
+                        placeholder="कम से कम 6 वर्ण"
+                        value={formData.password}
+                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                        required
+                        className="bg-background border-border"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-foreground mb-2">
+                        Confirm Password / पासवर्ड की पुष्टि करें *
+                      </label>
+                      <Input
+                        type="password"
+                        placeholder="पासवर्ड दोहराएं"
+                        value={formData.confirmPassword}
+                        onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                        required
+                        className="bg-background border-border"
+                      />
+                    </div>
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">
-                      Confirm Password / पासवर्ड की पुष्टि करें *
-                    </label>
-                    <Input
-                      type="password"
-                      placeholder="पासवर्ड दोहराएं"
-                      value={formData.confirmPassword}
-                      onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                      required
-                      className="bg-background border-border"
-                    />
+
+                  <div className="border-t border-border pt-6">
+                    <h3 className="text-lg font-semibold text-foreground mb-4">Payment Details / भुगतान विवरण</h3>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Please provide your UPI ID or QR code for registration fee verification by admin
+                    </p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <label className="block text-sm font-medium text-foreground mb-2">
+                          Registration Fee / पंजीकरण शुल्क
+                        </label>
+                        <Input
+                          type="number"
+                          placeholder="₹ Amount"
+                          value={formData.registrationFee}
+                          onChange={(e) => setFormData({ ...formData, registrationFee: e.target.value })}
+                          className="bg-background border-border"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-foreground mb-2">
+                          UPI ID / यूपीआई आईडी
+                        </label>
+                        <Input
+                          type="text"
+                          placeholder="yourname@ybl / yourname@okhdfcbank"
+                          value={formData.upiId}
+                          onChange={(e) => setFormData({ ...formData, upiId: e.target.value })}
+                          className="bg-background border-border"
+                        />
+                      </div>
+                    </div>
+                    <div className="mt-4">
+                      <label className="block text-sm font-medium text-foreground mb-2">
+                        QR Code URL / QR कोड URL
+                      </label>
+                      <Input
+                        type="text"
+                        placeholder="https://example.com/qr-code.png"
+                        value={formData.qrCodeUrl}
+                        onChange={(e) => setFormData({ ...formData, qrCodeUrl: e.target.value })}
+                        className="bg-background border-border"
+                      />
+                      <p className="text-xs text-muted-foreground mt-1">
+                        You can update this later in your profile
+                      </p>
+                    </div>
                   </div>
-                </div>
+                </>
               )}
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
