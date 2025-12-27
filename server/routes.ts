@@ -149,6 +149,10 @@ export async function registerRoutes(app: Express): Promise<void> {
         const admin = await Admin.findById(req.user.id).select("-password");
         if (!admin) return res.status(404).json({ error: "Admin not found" });
         res.json({ ...admin.toObject(), role: "admin" });
+      } else if (req.user?.role === "volunteer") {
+        const volunteer = await Volunteer.findById(req.user?.id).select("-password");
+        if (!volunteer) return res.status(404).json({ error: "Volunteer not found" });
+        res.json({ ...volunteer.toObject(), role: "volunteer" });
       } else {
         const student = await Student.findById(req.user?.id).select("-password");
         if (!student) return res.status(404).json({ error: "Student not found" });
